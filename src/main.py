@@ -6,6 +6,7 @@ import os
 from os import path
 import sys
 from util.common import CACHE_ROOT_DIR
+from util.git import sync
 from xdg.BaseDirectory import save_cache_path
 
 import mail
@@ -35,6 +36,9 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output-dir',
                         type=directory_type,
                         help='output directory')
+    parser.add_argument('--read-only',
+                        action='store_true',
+                        help='opperate on site in read-only mode')
 
     subparsers = parser.add_subparsers(title='subcommands')
     mail.argparse_configure(subparsers)
@@ -46,4 +50,15 @@ if __name__ == '__main__':
     logger = logging.getLogger()
     args.logger = logger
 
-    sys.exit(args.func(args))
+    repo_url = None
+    if not args.output_dir:
+        if args.read_only:
+            repo_url = 'https://github.com/boombatower/tumbleweed-review-site'
+        else:
+            repo_url = 'git@github.com:boombatower/tumbleweed-review-site'
+        args.output_dir = sync(args.cache_dir, repo_url)
+
+    ret = args.func(args)
+    if repo_url and path.exists(path.join(args.output_dir, '.git')) and not ret:
+        sync(args.cache_dir, repo_url)
+    sys.exit(ret)

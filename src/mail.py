@@ -242,7 +242,9 @@ def main(args):
     discussions = discussions_reduce(discussions)
     export = discussions_export(releases, discussions)
 
-    with open('discussions.tumbleweed.yml', 'w') as outfile:
+    output_dir = path.join(args.output_dir, 'data')
+    ensure_directory(output_dir)
+    with open(path.join(output_dir, 'mail.yaml'), 'w') as outfile:
         yaml.safe_dump(export, outfile)
 
     if logger.isEnabledFor(logging.DEBUG):
