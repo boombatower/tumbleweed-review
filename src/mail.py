@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from anytree import Node
 import argparse
 from datetime import date
@@ -15,6 +13,7 @@ import re
 import requests
 import shutil
 import sys
+from util.common import ensure_directory
 from xdg.BaseDirectory import save_cache_path
 import yaml
 
@@ -232,11 +231,11 @@ def discussion_print(export):
 
 def main(args):
     global logger
-    level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(level=level, format='[%(levelname).1s] %(message)s')
-    logger = logging.getLogger()
+    logger = args.logger
 
-    cache_dir = save_cache_path('tumbleweed-api', 'mbox')
+    cache_dir = path.join(args.cache_dir, 'mbox')
+    ensure_directory(cache_dir)
+
     mbox_paths = mboxes_download(cache_dir, args.start_month, not args.no_refresh)
     root, lookup, releases = mboxes_process(mbox_paths)
     discussions = discussions_find(root, lookup, releases)
@@ -258,12 +257,15 @@ def date_month_arg(string):
     except ValueError:
         raise argparse.ArgumentTypeError('invalid date "{}"'.format(string))
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Ingest Tumbleweed snapshot data.')
-    parser.add_argument('-d', '--debug', action='store_true', help='print debugging information')
-    parser.add_argument('--no-refresh', action='store_true', help='do not refresh relevant mboxes')
-    parser.add_argument('-s', '--start-month', type=date_month_arg, default='2016-01',
-                        help='Start month from which to ingest mboxes (ex. 2016-01)')
-
-    args = parser.parse_args()
-    sys.exit(main(args))
+def argparse_configure(subparsers):
+    parser = subparsers.add_parser(
+        'mail',
+        help='Ingest {} mailing list data and dump as JSON and YAML.'.format(MAILING_LIST))
+    parser.set_defaults(func=main)
+    parser.add_argument('--no-refresh',
+                        action='store_true',
+                        help='do not refresh relevant mboxes')
+    parser.add_argument('-s', '--start-month',
+                        type=date_month_arg,
+                        default='2016-01',
+                        help='Start month from which to ingest mboxes')
