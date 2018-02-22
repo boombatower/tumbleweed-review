@@ -1,0 +1,59 @@
+---
+---
+
+@import "minima";
+
+.post-list {
+  margin-left: 140px;
+
+  > li {
+    min-height: 120px;
+  }
+}
+
+.release-meta {
+  float: left;
+  margin-left: -140px;
+  padding: 10px;
+  width: 100px;
+  text-align: center;
+
+  &.release-stability-level {
+    &-unkown {
+      background-color: #eeeeee;
+      color: #666666;
+    }
+
+    &-stable {
+      background-color: teal;
+    }
+  }
+
+  border: 2px solid;
+  &.release-available {
+    &-false{
+      border-color: red;
+    }
+
+    &-true {
+      border-color: green;
+    }
+  }
+
+  .release-score {
+    display: block;
+    font-size: 35pt;
+  }
+}
+
+header.post-header {
+  time {
+    display: none;
+  }
+}
+
+article.post {
+  .release-install {
+    margin-top: 50px;
+  }
+}

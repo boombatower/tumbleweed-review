@@ -1,0 +1,42 @@
+---
+layout: default
+---
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <div class="release-meta release-stability-level-{{ page.release_stability_level }} release-available-{{ page.release_available }}">
+      <span class="release-score">{{ page.release_score }}</span>
+      <span class="release-stability-level">{{ page.release_stability_level }}</span>
+    </div>
+
+    {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
+    <h1 class="post-title p-name" itemprop="name headline">{{ page.date | date: date_format }}</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        {{ page.date | date: date_format }}
+      </time>
+      {% if page.author %}
+        • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
+      {% endif %}</p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    {{ content }}
+  </div>
+
+  {% if page.release_available %}
+  <div class="release-install">
+  <p>To install this release invoke the following.</p>
+
+{% highlight bash %}
+tumbleweed switch --install {{ page.release_version }}
+{% endhighlight %}
+  </div>
+  {% endif %}
+
+  {% if site.disqus.shortname %}
+    {% include disqus_comments.html %}
+  {% endif %}
+
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+</article>
