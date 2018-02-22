@@ -73,6 +73,7 @@ def list_detail_download(cache_dir, releases):
 
         url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'rpm.list']))
         binaries = request_cached(url, cache_dir, ttl_never).strip().splitlines()
+        details_release['binary_count'] = len(binaries)
 
         binary_interest = {}
         for binary in binaries:
