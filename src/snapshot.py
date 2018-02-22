@@ -30,5 +30,5 @@ def argparse_main(args):
 def argparse_configure(subparsers):
     parser = subparsers.add_parser(
         'snapshot',
-        help='Ingest snapshoted release data.')
+        help='Ingest snapshotted release data.')
     parser.set_defaults(func=argparse_main)
