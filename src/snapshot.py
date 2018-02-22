@@ -68,7 +68,7 @@ def list_detail_download(cache_dir, releases):
             continue
 
         details_release['disk_base'] = disk[0].split('\t')[0]
-        details_release['rpm_unique_count'] = int(disk[1].split(' ')[0])
+        details_release['binary_unique_count'] = int(disk[1].split(' ')[0])
         details_release['disk_shared'] = disk[2].split('\t')[0]
 
         url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'rpm.list']))
