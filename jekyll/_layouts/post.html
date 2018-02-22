@@ -18,6 +18,16 @@ layout: default
       {% if page.author %}
         • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
       {% endif %}</p>
+    {% if page.release_available %}
+    <div class="release-info">
+      <ul>
+        <li>unique: {{ page.release_binary_unique_count }}
+        <li>total: {{ page.release_binary_count }}
+        <li>base: {{ page.release_disk_base }}
+        <li>shared: {{ page.release_disk_shared }}
+      </ul>
+    </div>
+    {% endif %}
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">

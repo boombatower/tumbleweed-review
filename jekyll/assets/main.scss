@@ -47,6 +47,23 @@
   }
 }
 
+.release-info {
+  ul {
+    margin-left: 0;
+    margin-top: -10px;
+    list-style: none;
+    background-color: #eeeeee;
+    border: 2px solid #cccccc;
+    border-radius: 3px;
+
+    li {
+      display: inline;
+      padding: 5px 10px;
+      border-right: 1px solid #cccccc;
+    }
+  }
+}
+
 header.post-header {
   time {
     display: none;

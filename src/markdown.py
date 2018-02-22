@@ -37,9 +37,9 @@ def mail_build(mail_release):
 
 def variables_format(variables):
     out = ''
-    for key, value in variables.items():
+    for key, value in sorted(variables.items()):
         out += '{}: {}\n'.format(key, value)
-    return out
+    return out.strip()
 
 def posts_build(posts_dir, mail, snapshot):
     template_path = path.join(ROOT_PATH, 'jekyll', '_posts', '.template.md')
@@ -59,6 +59,11 @@ def posts_build(posts_dir, mail, snapshot):
             'release_stability_level': 'unknown',
             'release_version': release,
         }
+
+        if release in snapshot:
+            for key, value in snapshot[release].items():
+                if not key.startswith('binary_interest'):
+                    variables['release_{}'.format(key)] = value
 
         post = template.format(
             release=release,

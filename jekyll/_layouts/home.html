@@ -25,6 +25,16 @@ layout: default
             {{ post.date | date: date_format }}
           </a>
         </h3>
+        {% if post.release_available %}
+        <div class="release-info">
+          <ul>
+            <li>unique: {{ post.release_binary_unique_count }}
+            <li>total: {{ post.release_binary_count }}
+            <li>base: {{ post.release_disk_base }}
+            <li>shared: {{ post.release_disk_shared }}
+          </ul>
+        </div>
+        {% endif %}
         {% if site.show_excerpts %}
           {{ post.excerpt }}
         {% endif %}
