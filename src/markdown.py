@@ -7,13 +7,19 @@ import yaml
 
 def data_load(data_dir):
     mail = None
+    snapshot = None
 
     mail_path = path.join(data_dir, 'mail.yaml')
     if path.exists(mail_path):
         with open(mail_path, 'r') as mail_handle:
             mail = yaml.safe_load(mail_handle)
 
-    return mail
+    snapshot_path = path.join(data_dir, 'snapshot.yaml')
+    if path.exists(snapshot_path):
+        with open(snapshot_path, 'r') as mail_handle:
+            snapshot = yaml.safe_load(mail_handle)
+
+    return mail, snapshot
 
 def mail_build(mail_release):
     lines = []
@@ -29,7 +35,7 @@ def mail_build(mail_release):
 
     return mail_release['reference_count'], '\n'.join(lines)
 
-def posts_build(posts_dir, mail):
+def posts_build(posts_dir, mail, snapshot):
     template_path = path.join(ROOT_PATH, 'jekyll', '_posts', '.template.md')
     with open(template_path, 'r') as template_handle:
         template = template_handle.read()
@@ -41,6 +47,7 @@ def posts_build(posts_dir, mail):
 
         post = template.format(
             release=release,
+            available=str(release in snapshot).lower(),
             reference_count=rererence_count,
             mail=mail_markdown,
         )
@@ -59,8 +66,8 @@ def main(args):
     ensure_directory(posts_dir)
     data_dir = path.join(args.output_dir, 'data')
 
-    mail = data_load(data_dir)
-    posts_build(posts_dir, mail)
+    mail, snapshot = data_load(data_dir)
+    posts_build(posts_dir, mail, snapshot)
 
 def argparse_configure(subparsers):
     parser = subparsers.add_parser(
