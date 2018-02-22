@@ -11,6 +11,7 @@ from util.git import sync
 from xdg.BaseDirectory import save_cache_path
 
 import mail
+import markdown
 
 SCRIPT_PATH = path.dirname(path.realpath(__file__))
 ROOT_PATH = path.normpath(path.join(SCRIPT_PATH, '..'))
@@ -46,6 +47,7 @@ if __name__ == '__main__':
 
     subparsers = parser.add_subparsers(title='subcommands')
     mail.argparse_configure(subparsers)
+    markdown.argparse_configure(subparsers)
 
     args = parser.parse_args()
 
