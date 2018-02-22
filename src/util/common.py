@@ -12,6 +12,7 @@ def jekyll_init(site_dir):
     from main import ROOT_PATH
     jekyll_dir = path.join(ROOT_PATH, 'jekyll')
     tree_copy(jekyll_dir, site_dir, ignore=shutil.ignore_patterns('.template.md'))
+    shutil.copy(path.join(ROOT_PATH, 'LICENSE'), path.join(site_dir, 'LICENSE'))
 
 # Modified from shutil.copytree() to allow for dst to already exist.
 def tree_copy(src, dst, symlinks=False, ignore=None):
