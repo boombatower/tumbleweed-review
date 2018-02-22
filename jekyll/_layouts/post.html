@@ -32,6 +32,10 @@ layout: default
 tumbleweed switch --install {{ page.release_version }}
 {% endhighlight %}
   </div>
+  {% else %}
+  <div class="alert alert-warning release-unavailable">
+  <p>The release was either never snapshotted or has been removed.</p>
+  </div>
   {% endif %}
 
   {% if site.disqus.shortname %}
