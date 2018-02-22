@@ -1,6 +1,10 @@
+from datetime import datetime
+from datetime import timedelta
 import os
 from os import path
+import requests
 import shutil
+from urllib.parse import urlparse
 
 CACHE_ROOT_DIR = 'tumbleweed-review'
 
@@ -56,3 +60,21 @@ def tree_copy(src, dst, symlinks=False, ignore=None):
         errors.extend((src, dst, str(why)))
     if errors:
         raise Error(errors)
+
+def request_cached(url, cache_dir, ttl=timedelta(hours=1)):
+    url_path = urlparse(url).path[1:] # Remove leading slash.
+    cache_path = path.join(cache_dir, url_path)
+    if path.exists(cache_path):
+        cache_modified = datetime.fromtimestamp(path.getmtime(cache_path))
+        cache_delta = datetime.now() - cache_modified
+        if cache_delta < ttl:
+            return open(cache_path, 'r').read()
+    else:
+        ensure_directory(path.dirname(cache_path))
+
+    response = requests.get(url)
+
+    with open(cache_path, 'w') as cache_handle:
+        cache_handle.write(response.text)
+
+    return response.text
