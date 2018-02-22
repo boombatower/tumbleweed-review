@@ -22,7 +22,7 @@ def directory_type(string):
     if path.isdir(string):
         return string
 
-    argparse.ArgumentTypeError('{} is not a directory'.format(string))
+    raise argparse.ArgumentTypeError('{} is not a directory'.format(string))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
