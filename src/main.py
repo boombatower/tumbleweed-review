@@ -6,10 +6,14 @@ import os
 from os import path
 import sys
 from util.common import CACHE_ROOT_DIR
+from util.common import jekyll_init
 from util.git import sync
 from xdg.BaseDirectory import save_cache_path
 
 import mail
+
+SCRIPT_PATH = path.dirname(path.realpath(__file__))
+ROOT_PATH = path.normpath(path.join(SCRIPT_PATH, '..'))
 
 def main(args):
     print('TODO')
@@ -57,6 +61,8 @@ if __name__ == '__main__':
         else:
             repo_url = 'git@github.com:boombatower/tumbleweed-review-site'
         args.output_dir = sync(args.cache_dir, repo_url)
+
+    jekyll_init(args.output_dir)
 
     ret = args.func(args)
     if repo_url and path.exists(path.join(args.output_dir, '.git')) and not ret:
