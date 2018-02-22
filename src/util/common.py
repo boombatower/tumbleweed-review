@@ -61,9 +61,12 @@ def tree_copy(src, dst, symlinks=False, ignore=None):
     if errors:
         raise Error(errors)
 
-def request_cached(url, cache_dir, ttl=timedelta(hours=1)):
+def request_cached_path(url, cache_dir):
     url_path = urlparse(url).path[1:] # Remove leading slash.
-    cache_path = path.join(cache_dir, url_path)
+    return path.join(cache_dir, url_path)
+
+def request_cached(url, cache_dir, ttl=timedelta(hours=1)):
+    cache_path = request_cached_path(url, cache_dir)
     if path.exists(cache_path):
         cache_modified = datetime.fromtimestamp(path.getmtime(cache_path))
         cache_delta = datetime.now() - cache_modified
