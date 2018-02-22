@@ -35,6 +35,12 @@ def mail_build(mail_release):
 
     return mail_release['reference_count'], '\n'.join(lines)
 
+def variables_format(variables):
+    out = ''
+    for key, value in variables.items():
+        out += '{}: {}\n'.format(key, value)
+    return out
+
 def posts_build(posts_dir, mail, snapshot):
     template_path = path.join(ROOT_PATH, 'jekyll', '_posts', '.template.md')
     with open(template_path, 'r') as template_handle:
@@ -43,12 +49,20 @@ def posts_build(posts_dir, mail, snapshot):
     # Likely want to ingest release data as seperate item directly from source.
     for release, mail_release in mail.items():
         reference_count_mail, mail_markdown = mail_build(mail_release)
-        rererence_count = reference_count_mail
+        reference_count = reference_count_mail
+
+        variables = {
+            'release_available': str(release in snapshot).lower(),
+            'release_reference_count': reference_count,
+            'release_reference_count_mail': reference_count_mail,
+            'release_score': 0,
+            'release_stability_level': 'unknown',
+            'release_version': release,
+        }
 
         post = template.format(
             release=release,
-            available=str(release in snapshot).lower(),
-            reference_count=rererence_count,
+            variables=variables_format(variables),
             mail=mail_markdown,
         )
 
