@@ -1,10 +1,13 @@
 from datetime import timedelta
+import os
 from os import path
 import re
 import requests
+import stat
 from urllib.parse import urljoin
 from util.common import ensure_directory
 from util.common import request_cached
+from util.common import request_cached_path
 import yaml
 
 SNAPSHOT_BASEURL = 'http://download.tumbleweed.boombatower.com/'
@@ -40,19 +43,36 @@ def list_detail_download(cache_dir, releases):
     details = {}
 
     binary_regex = re.compile(BINARY_REGEX)
-    ttl = timedelta(days=300) # Should never change.
-    # Skip first release since it may not be snapshotted yet.
-    for release in releases[1:]:
+    ttl_never = timedelta(days=300) # Should never change.
+    ttl_retry = timedelta(hours=4) # While waiting for snapshot.
+    for release in releases:
         details_release = {}
 
         url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'disk']))
-        disk = request_cached(url, cache_dir, ttl).strip().splitlines()
+        disk_path = request_cached_path(url, cache_dir)
+        if path.exists(disk_path) and not os.stat(disk_path)[stat.ST_SIZE]:
+            logger.debug('using retry ttl for %s disk file', release)
+            disk_ttl = ttl_retry
+        else:
+            disk_ttl = ttl_never
+        disk = request_cached(url, cache_dir, disk_ttl).strip().splitlines()
+
+        if len(disk) != 3:
+            # Skip for now and retry later.
+            logger.debug('skipping %s due to invalid disk file', release)
+
+            if len(disk) != 0:
+                # Clear cache file to indicate invalid.
+                open(disk_path, 'w').write('')
+
+            continue
+
         details_release['disk_base'] = disk[0].split('\t')[0]
         details_release['rpm_unique_count'] = int(disk[1].split(' ')[0])
         details_release['disk_shared'] = disk[2].split('\t')[0]
 
         url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'rpm.list']))
-        binaries = request_cached(url, cache_dir, ttl).strip().splitlines()
+        binaries = request_cached(url, cache_dir, ttl_never).strip().splitlines()
 
         binary_interest = {}
         for binary in binaries:
@@ -63,7 +83,7 @@ def list_detail_download(cache_dir, releases):
         details_release['binary_interest'] = binary_interest
 
         url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'rpm.unique.list']))
-        binaries = request_cached(url, cache_dir, ttl).strip().splitlines()
+        binaries = request_cached(url, cache_dir, ttl_never).strip().splitlines()
 
         binary_interest_changed = []
         for binary in binaries:
