@@ -11,5 +11,47 @@ def ensure_directory(directory):
 def jekyll_init(site_dir):
     from main import ROOT_PATH
     jekyll_dir = path.join(ROOT_PATH, 'jekyll')
-    for name in ('.gitignore', '_config.yml', 'index.md'):
-        shutil.copy(path.join(jekyll_dir, name), path.join(site_dir, name))
+    tree_copy(jekyll_dir, site_dir, ignore=shutil.ignore_patterns('.template.md'))
+
+# Modified from shutil.copytree() to allow for dst to already exist.
+def tree_copy(src, dst, symlinks=False, ignore=None):
+    names = os.listdir(src)
+    if ignore is not None:
+        ignored_names = ignore(src, names)
+    else:
+        ignored_names = set()
+
+    if not path.exists(dst):
+        # Changed to only create dir when not exists
+        os.makedirs(dst)
+
+    errors = []
+    for name in names:
+        if name in ignored_names:
+            continue
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        try:
+            if symlinks and os.path.islink(srcname):
+                linkto = os.readlink(srcname)
+                os.symlink(linkto, dstname)
+            elif os.path.isdir(srcname):
+                tree_copy(srcname, dstname, symlinks, ignore)
+            else:
+                shutil.copy2(srcname, dstname)
+            # XXX What about devices, sockets etc.?
+        except (IOError, os.error) as why:
+            errors.append((srcname, dstname, str(why)))
+        # catch the Error from the recursive tree_copy so that we can
+        # continue with other files
+        except Error as err:
+            errors.extend(err.args[0])
+    try:
+        shutil.copystat(src, dst)
+    except WindowsError:
+        # can't copy file access times on Windows
+        pass
+    except OSError as why:
+        errors.extend((src, dst, str(why)))
+    if errors:
+        raise Error(errors)
