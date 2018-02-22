@@ -67,7 +67,7 @@ def request_cached(url, cache_dir, ttl=timedelta(hours=1)):
     if path.exists(cache_path):
         cache_modified = datetime.fromtimestamp(path.getmtime(cache_path))
         cache_delta = datetime.now() - cache_modified
-        if cache_delta < ttl:
+        if cache_delta <= ttl:
             return open(cache_path, 'r').read()
     else:
         ensure_directory(path.dirname(cache_path))
