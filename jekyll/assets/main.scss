@@ -80,4 +80,13 @@ article.post {
   p {
     margin: 0;
   }
+
+  figure.highlight {
+    margin-top: 15px;
+    color: black;
+  }
+
+  figure.highlight, figure.highlight pre {
+    margin-bottom: 0;
+  }
 }
