@@ -4,7 +4,7 @@
 @import "minima";
 
 .post-list {
-  margin-left: 140px;
+  margin-left: 150px;
 
   > li {
     min-height: 120px;
@@ -13,7 +13,7 @@
 
 .release-meta {
   float: left;
-  margin-left: -140px;
+  margin-left: -150px;
   padding: 10px;
   width: 100px;
   text-align: center;
@@ -29,14 +29,15 @@
     }
   }
 
-  border: 2px solid;
+  border: 6px solid;
+  border-radius: 10px;
   &.release-available {
     &-false{
-      border-color: red;
+      border-color: #faebcc;
     }
 
     &-true {
-      border-color: green;
+      border-color: #d6e9c6;
     }
   }
 
