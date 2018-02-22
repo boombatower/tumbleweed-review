@@ -13,6 +13,12 @@ theme: minima
 minima:
   date_format: "%Y-%m-%d"
 
+show_excerpts: true
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+
 exclude:
   - CNAME
   - LICENSE
