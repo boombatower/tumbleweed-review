@@ -24,12 +24,28 @@
 
   &.release-stability-level {
     &-unknown {
+      background-color: #cccccc;
+      color: #666666;
+    }
+
+    &-pending {
       background-color: #eeeeee;
       color: #666666;
     }
 
+    &-unstable {
+      background-color: #A1D890;
+      color: white;
+    }
+
+    &-moderate{
+      background-color: #70B45A;
+      color: white;
+    }
+
     &-stable {
-      background-color: teal;
+      background-color: #114800;
+      color: white;
     }
   }
 
