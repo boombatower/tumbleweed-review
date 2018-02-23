@@ -27,9 +27,16 @@ def mail_build(mail_release):
 
     for thread in sorted(mail_release['threads'],
                          key=lambda t: t['reference_count'], reverse=True):
-        lines.append('- <{}> {}'.format(thread['reference_count'], thread['summary']))
-        for message in thread['messages']:
-            lines.append('  - [{}]({})'.format(message, mailing_list_url(message)))
+        line = link_format(thread['summary'], mailing_list_url(thread['messages'][0]))
+        line += ' ({} refs)'.format(thread['reference_count'])
+        extra = []
+        for message in thread['messages'][1:]:
+            extra.append(link_format(message, mailing_list_url(message)))
+
+        if len(extra):
+            line += '; ' + ', '.join(extra)
+
+        lines.append('- ' + line)
 
     return mail_release['reference_count'], '\n'.join(lines)
 
@@ -88,16 +95,17 @@ def posts_build(posts_dir, mail, snapshot):
             binary_interest = ''
 
         if not mail_markdown:
-            mail_markdown = 'No interesting mail references.'
+            mail_markdown = 'no relevant mails'
 
         links = '- ' + '\n- '.join(links)
 
         post = template.format(
             release=release,
             variables=variables_format(variables),
+            mail=mail_markdown,
+            mail_count=mail_release['thread_count'],
             binary_interest=binary_interest,
             links=links,
-            mail=mail_markdown,
         )
 
         date = '-'.join(release_parts(release))
