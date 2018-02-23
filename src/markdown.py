@@ -114,6 +114,7 @@ def posts_build(posts_dir, bug, mail, score, snapshot):
             bug_count=reference_count_bug,
             mail=mail_markdown,
             mail_count=mail_release['thread_count'],
+            mail_reference_count=reference_count_mail,
             binary_interest=binary_interest,
             links=links,
         )
