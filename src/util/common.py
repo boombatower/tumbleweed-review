@@ -5,6 +5,7 @@ from os import path
 import requests
 import shutil
 from urllib.parse import urlparse
+import yaml
 
 CACHE_ROOT_DIR = 'tumbleweed-review'
 
@@ -84,3 +85,11 @@ def request_cached(url, cache_dir, ttl=timedelta(hours=1)):
 
 def release_parts(release):
     return release[0:4], release[4:6], release[6:8]
+
+def data_load(data_dir, name):
+    name_path = path.join(data_dir, name)
+    if path.exists(name_path):
+        with open(name_path, 'r') as handle:
+            return yaml.safe_load(handle)
+
+    return None

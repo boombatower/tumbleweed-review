@@ -10,6 +10,7 @@ from util.common import jekyll_init
 from util.git import sync
 from xdg.BaseDirectory import save_cache_path
 
+import bug
 import mail
 import markdown
 import snapshot
@@ -47,6 +48,7 @@ if __name__ == '__main__':
                         help='opperate on site in read-only mode')
 
     subparsers = parser.add_subparsers(title='subcommands')
+    bug.argparse_configure(subparsers)
     mail.argparse_configure(subparsers)
     markdown.argparse_configure(subparsers)
     snapshot.argparse_configure(subparsers)
