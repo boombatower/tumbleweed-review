@@ -230,6 +230,12 @@ def discussion_print(export):
             print('- {} <{} / {}>'.format(
                 thread['summary'], thread['reference_count'], ', '.join(thread['messages'])))
 
+def mailing_list_url(message):
+    month, number = message.split('.')
+    year, month = month.split('-')
+    return MAILING_LIST_URL.format(
+        list=MAILING_LIST, year=year, month=month, number=int(number))
+
 def main(args):
     global logger
     logger = args.logger

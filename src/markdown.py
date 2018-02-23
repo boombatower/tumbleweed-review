@@ -1,5 +1,4 @@
-from mail import MAILING_LIST
-from mail import MAILING_LIST_URL
+from mail import mailing_list_url
 from main import ROOT_PATH
 from os import path
 from util.common import ensure_directory
@@ -28,10 +27,7 @@ def mail_build(mail_release):
                          key=lambda t: t['reference_count'], reverse=True):
         lines.append('- <{}> {}'.format(thread['reference_count'], thread['summary']))
         for message in thread['messages']:
-            month, number = message.split('.')
-            year, month = month.split('-')
-            lines.append('  - [{}]({})'.format(message, MAILING_LIST_URL.format(
-                list=MAILING_LIST, year=year, month=month, number=int(number))))
+            lines.append('  - [{}]({})'.format(message, mailing_list_url(message)))
 
     return mail_release['reference_count'], '\n'.join(lines)
 
