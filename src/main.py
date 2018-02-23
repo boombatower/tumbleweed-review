@@ -13,6 +13,7 @@ from xdg.BaseDirectory import save_cache_path
 import bug
 import mail
 import markdown
+import score
 import snapshot
 
 SCRIPT_PATH = path.dirname(path.realpath(__file__))
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     bug.argparse_configure(subparsers)
     mail.argparse_configure(subparsers)
     markdown.argparse_configure(subparsers)
+    score.argparse_configure(subparsers)
     snapshot.argparse_configure(subparsers)
 
     args = parser.parse_args()
