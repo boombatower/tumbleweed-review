@@ -47,6 +47,9 @@ def table_format(headings, data, bold):
         out.append(' | '.join([key, value]))
     return '\n'.join(out)
 
+def link_format(text, href):
+    return '[{}]({})'.format(text, href)
+
 def posts_build(posts_dir, mail, snapshot):
     template_path = path.join(ROOT_PATH, 'jekyll', '_posts', '.template.md')
     with open(template_path, 'r') as template_handle:
@@ -65,6 +68,9 @@ def posts_build(posts_dir, mail, snapshot):
             'release_stability_level': 'unknown',
             'release_version': release,
         }
+        links = []
+
+        links.append(link_format('mail announcement', mailing_list_url(mail_release['announcement'])))
 
         if release in snapshot:
             release_snapshot = snapshot[release]
@@ -79,10 +85,13 @@ def posts_build(posts_dir, mail, snapshot):
         if not mail_markdown:
             mail_markdown = 'No interesting mail references.'
 
+        links = '- ' + '\n- '.join(links)
+
         post = template.format(
             release=release,
             variables=variables_format(variables),
             binary_interest=binary_interest,
+            links=links,
             mail=mail_markdown,
         )
 
