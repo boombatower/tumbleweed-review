@@ -11,7 +11,7 @@ layout: default
 
   {% if site.posts.size > 0 %}
     <h2 class="post-list-heading">{{ page.list_title | default: "Releases" }}
-    <span class="rss-subscribe">(<a href="{{ "/feed.xml" | relative_url }}">rss</span>)</p></h2>
+    <span class="rss-subscribe">(<a href="{{ "/feed.xml" | relative_url }}">rss</a>)</span></h2>
     <ul class="post-list">
       {% for post in site.posts %}
       <li>
