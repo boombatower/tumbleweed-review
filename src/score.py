@@ -31,7 +31,8 @@ def mail_score(mail_release):
 
 def snapshot_score(snapshot):
     if not snapshot:
-        return 10
+        # Any snapshot deltas will be noticed in next snapshot anyway.
+        return 0
 
     impact = 0
 
