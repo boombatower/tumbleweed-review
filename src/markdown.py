@@ -2,7 +2,6 @@ from bug import bugzilla_url
 from mail import mailing_list_url
 from main import ROOT_PATH
 from os import path
-from score import stability_level
 from snapshot import snapshot_url
 from util.common import ensure_directory
 from util.common import release_parts
@@ -73,14 +72,14 @@ def posts_build(posts_dir, bug, mail, score, snapshot):
         reference_count_bug, bug_markdown = bug_build(bug.get(release, []))
         reference_count_mail, mail_markdown = mail_build(mail_release)
         reference_count = reference_count_bug + reference_count_mail
-        score_release = score.get(release, {}).get('score', 'n/a')
+        score_release = score.get(release, {})
 
         variables = {
             'release_available': str(release in snapshot).lower(),
             'release_reference_count': reference_count,
             'release_reference_count_mail': reference_count_mail,
-            'release_score': score_release,
-            'release_stability_level': stability_level(release, score_release),
+            'release_score': score_release.get('score', 'n/a'),
+            'release_stability_level': score_release.get('stability_level', 'unknown'),
             'release_version': release,
         }
         links = []
