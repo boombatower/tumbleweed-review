@@ -5,9 +5,9 @@ from datetime import datetime
 from mail import date_month_arg
 from os import path
 from urllib.parse import urljoin
-from util.common import data_load
 from util.common import ensure_directory
 from util.common import release_parts
+from util.common import yaml_load
 import yaml
 
 BUGZILLA_BASEURL = 'https://bugzilla.opensuse.org/'

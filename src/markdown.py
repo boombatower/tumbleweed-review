@@ -5,29 +5,12 @@ from os import path
 from snapshot import snapshot_url
 from util.common import ensure_directory
 from util.common import release_parts
-import yaml
+from util.common import yaml_load
 
 def data_load(data_dir):
-    bug = None
-    mail = None
-    snapshot = None
-
-    bug_path = path.join(data_dir, 'bug.yaml')
-    if path.exists(bug_path):
-        with open(bug_path, 'r') as bug_handle:
-            bug = yaml.safe_load(bug_handle)
-
-    mail_path = path.join(data_dir, 'mail.yaml')
-    if path.exists(mail_path):
-        with open(mail_path, 'r') as mail_handle:
-            mail = yaml.safe_load(mail_handle)
-
-    snapshot_path = path.join(data_dir, 'snapshot.yaml')
-    if path.exists(snapshot_path):
-        with open(snapshot_path, 'r') as snapshot_handle:
-            snapshot = yaml.safe_load(snapshot_handle)
-
-    return bug, mail, snapshot
+    return yaml_load(data_dir, 'bug.yaml'), \
+        yaml_load(data_dir, 'mail.yaml'), \
+        yaml_load(data_dir, 'snapshot.yaml')
 
 def bug_build(bug_release):
     lines = []
