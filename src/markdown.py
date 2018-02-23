@@ -1,6 +1,7 @@
 from mail import mailing_list_url
 from main import ROOT_PATH
 from os import path
+from snapshot import snapshot_url
 from util.common import ensure_directory
 import yaml
 
@@ -79,6 +80,9 @@ def posts_build(posts_dir, mail, snapshot):
                     variables['release_{}'.format(key)] = value
 
             binary_interest = table_format(['Binary', 'Version'], release_snapshot['binary_interest'], release_snapshot['binary_interest_changed'])
+
+            links.append(link_format('binary unique list', snapshot_url(release, 'rpm.unique.list')))
+            links.append(link_format('binary list', snapshot_url(release, 'rpm.list')))
         else:
             binary_interest = ''
 
