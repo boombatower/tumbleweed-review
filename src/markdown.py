@@ -41,6 +41,16 @@ def variables_format(variables):
         out += '{}: {}\n'.format(key, value)
     return out.strip()
 
+def table_format(headings, data, bold):
+    out = []
+    out.append(' | '.join(headings))
+    out.append(' | '.join(['---'] * len(headings)))
+    for key, value in data.items():
+        if key in bold:
+            key = '**{}**'.format(key)
+        out.append(' | '.join([key, value]))
+    return '\n'.join(out)
+
 def posts_build(posts_dir, mail, snapshot):
     template_path = path.join(ROOT_PATH, 'jekyll', '_posts', '.template.md')
     with open(template_path, 'r') as template_handle:
@@ -61,13 +71,19 @@ def posts_build(posts_dir, mail, snapshot):
         }
 
         if release in snapshot:
-            for key, value in snapshot[release].items():
+            release_snapshot = snapshot[release]
+            for key, value in release_snapshot.items():
                 if not key.startswith('binary_interest'):
                     variables['release_{}'.format(key)] = value
+
+            binary_interest = table_format(['Binary', 'Version'], release_snapshot['binary_interest'], release_snapshot['binary_interest_changed'])
+        else:
+            binary_interest = ''
 
         post = template.format(
             release=release,
             variables=variables_format(variables),
+            binary_interest=binary_interest,
             mail=mail_markdown,
         )
 

@@ -71,6 +71,29 @@ header.post-header {
 }
 
 article.post {
+  table {
+    width: 500px;
+
+    thead {
+      th {
+        background-color: #cccccc;
+      }
+    }
+
+    tbody {
+      tr {
+        td {
+          padding: 0 10px;
+          background-color: #eeeeee;
+
+          &:nth-child(2) {
+            text-align: right;
+          }
+        }
+      }
+    }
+  }
+
   .release-install, .release-unavailable {
     margin-top: 50px;
   }
