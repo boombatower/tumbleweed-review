@@ -64,17 +64,17 @@
   }
 }
 
-header.post-header {
-  min-height: 130px;
-  margin-bottom: 10px;
-  margin-left: 150px;
+article.post.h-entry {
+  header.post-header {
+    min-height: 130px;
+    margin-bottom: 10px;
+    margin-left: 150px;
 
-  time {
-    display: none;
+    time {
+      display: none;
+    }
   }
-}
 
-article.post {
   table {
     margin-bottom: 15px;
     width: 500px;
