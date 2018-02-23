@@ -1,3 +1,4 @@
+from bug import bugzilla_url
 from mail import mailing_list_url
 from main import ROOT_PATH
 from os import path
@@ -7,8 +8,14 @@ from util.common import release_parts
 import yaml
 
 def data_load(data_dir):
+    bug = None
     mail = None
     snapshot = None
+
+    bug_path = path.join(data_dir, 'bug.yaml')
+    if path.exists(bug_path):
+        with open(bug_path, 'r') as bug_handle:
+            bug = yaml.safe_load(bug_handle)
 
     mail_path = path.join(data_dir, 'mail.yaml')
     if path.exists(mail_path):
@@ -17,10 +24,22 @@ def data_load(data_dir):
 
     snapshot_path = path.join(data_dir, 'snapshot.yaml')
     if path.exists(snapshot_path):
-        with open(snapshot_path, 'r') as mail_handle:
-            snapshot = yaml.safe_load(mail_handle)
+        with open(snapshot_path, 'r') as snapshot_handle:
+            snapshot = yaml.safe_load(snapshot_handle)
 
-    return mail, snapshot
+    return bug, mail, snapshot
+
+def bug_build(bug_release):
+    lines = []
+
+    for bug in sorted(bug_release, key=lambda b: b['id']):
+        line = link_format('{}: {}'.format(
+            bug['id'], bug['summary']), bugzilla_url(bug['id']))
+        if bug['status'] == 'RESOLVED':
+            line = '~~{}~~'.format(line)
+        lines.append('- ' + line)
+
+    return len(lines), '\n'.join(lines)
 
 def mail_build(mail_release):
     lines = []
@@ -59,15 +78,16 @@ def table_format(headings, data, bold):
 def link_format(text, href):
     return '[{}]({})'.format(text, href)
 
-def posts_build(posts_dir, mail, snapshot):
+def posts_build(posts_dir, bug, mail, snapshot):
     template_path = path.join(ROOT_PATH, 'jekyll', '_posts', '.template.md')
     with open(template_path, 'r') as template_handle:
         template = template_handle.read()
 
     # Likely want to ingest release data as seperate item directly from source.
     for release, mail_release in mail.items():
+        reference_count_bug, bug_markdown = bug_build(bug.get(release, []))
         reference_count_mail, mail_markdown = mail_build(mail_release)
-        reference_count = reference_count_mail
+        reference_count = reference_count_bug + reference_count_mail
 
         variables = {
             'release_available': str(release in snapshot).lower(),
@@ -94,6 +114,8 @@ def posts_build(posts_dir, mail, snapshot):
         else:
             binary_interest = ''
 
+        if not bug_markdown:
+            bug_markdown = 'no relevant bugs'
         if not mail_markdown:
             mail_markdown = 'no relevant mails'
 
@@ -102,6 +124,8 @@ def posts_build(posts_dir, mail, snapshot):
         post = template.format(
             release=release,
             variables=variables_format(variables),
+            bug=bug_markdown,
+            bug_count=reference_count_bug,
             mail=mail_markdown,
             mail_count=mail_release['thread_count'],
             binary_interest=binary_interest,
@@ -122,8 +146,8 @@ def main(args):
     ensure_directory(posts_dir)
     data_dir = path.join(args.output_dir, 'data')
 
-    mail, snapshot = data_load(data_dir)
-    posts_build(posts_dir, mail, snapshot)
+    bug, mail, snapshot = data_load(data_dir)
+    posts_build(posts_dir, bug, mail, snapshot)
 
 def argparse_configure(subparsers):
     parser = subparsers.add_parser(
