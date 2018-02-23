@@ -6,7 +6,7 @@ from mail import date_month_arg
 from os import path
 from urllib.parse import urljoin
 from util.common import ensure_directory
-from util.common import release_parts
+from util.common import release_to_date
 from util.common import yaml_load
 import yaml
 
@@ -74,7 +74,7 @@ def main(logger_, cache_dir, data_dir, bugzilla_apiurl, start_month):
     bugzilla_api = bugzilla_init(bugzilla_apiurl)
     bugs = bugzilla_query(bugzilla_api, start_month)
 
-    mail = data_load(data_dir, 'mail.yaml')
+    mail = yaml_load(data_dir, 'mail.yaml')
     bugs_release = bug_release_associate(bugs, mail)
 
     with open(path.join(data_dir, 'bug.yaml'), 'w') as outfile:
