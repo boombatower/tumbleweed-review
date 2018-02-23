@@ -1,3 +1,4 @@
+from datetime import date
 from datetime import datetime
 from datetime import timedelta
 import os
@@ -85,6 +86,9 @@ def request_cached(url, cache_dir, ttl=timedelta(hours=1)):
 
 def release_parts(release):
     return release[0:4], release[4:6], release[6:8]
+
+def release_to_date(release):
+    return date(*map(int, release_parts(release)))
 
 def yaml_load(data_dir, name):
     name_path = path.join(data_dir, name)

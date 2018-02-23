@@ -46,7 +46,7 @@ def bug_release_associate(bugs, mail):
     bugs_reversed = reversed(bugs) # Already in order, so start with newest.
     bug_previous = None
     for release in sorted(mail, reverse=True):
-        release_date = date(*map(int, release_parts(release)))
+        release_date = release_to_date(release)
         bugs_release.setdefault(release, [])
 
         if bug_previous:
