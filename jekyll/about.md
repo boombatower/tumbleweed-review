@@ -42,4 +42,6 @@ Due to a [hosting limitation](http://release-tools.opensuse.org/2018/02/09/w05-0
 - [Announcing Tumbleweed Snapshots: Rolling With You](http://release-tools.opensuse.org/2017/11/22/Tumbleweed-Snapshots.html)
 - [Tumbleweed dasbhoard](http://tumbleweed.boombatower.com/) (refreshed on load, will take a minute)
 - [Tumbleweed snapshots download hub](http://download.tumbleweed.boombatower.com/)
-- [source code](https://github.com/boombatower/tumbleweed-review)
+- source code
+  - [generator](https://github.com/boombatower/tumbleweed-review)
+  - [site](https://github.com/boombatower/tumbleweed-review-site)
