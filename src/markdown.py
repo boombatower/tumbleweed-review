@@ -80,6 +80,9 @@ def posts_build(posts_dir, mail, snapshot):
         else:
             binary_interest = ''
 
+        if not mail_markdown:
+            mail_markdown = 'No interesting mail references.'
+
         post = template.format(
             release=release,
             variables=variables_format(variables),
