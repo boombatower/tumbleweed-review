@@ -39,6 +39,9 @@ def list_download(cache_dir):
     url = urljoin(SNAPSHOT_BASEURL, 'list')
     return request_cached(url, cache_dir).strip().splitlines()
 
+def snapshot_url(release, path):
+    return urljoin(SNAPSHOT_BASEURL, '/'.join([release, path]))
+
 def list_detail_download(cache_dir, releases):
     details = {}
 
@@ -48,7 +51,7 @@ def list_detail_download(cache_dir, releases):
     for release in releases:
         details_release = {}
 
-        url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'disk']))
+        url = snapshot_url(release, 'disk')
         disk_path = request_cached_path(url, cache_dir)
         if path.exists(disk_path) and not os.stat(disk_path)[stat.ST_SIZE]:
             logger.debug('using retry ttl for %s disk file', release)
@@ -71,7 +74,7 @@ def list_detail_download(cache_dir, releases):
         details_release['binary_unique_count'] = int(disk[1].split(' ')[0])
         details_release['disk_shared'] = disk[2].split('\t')[0]
 
-        url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'rpm.list']))
+        url = snapshot_url(release, 'rpm.list')
         binaries = request_cached(url, cache_dir, ttl_never).strip().splitlines()
         details_release['binary_count'] = len(binaries)
 
@@ -83,7 +86,7 @@ def list_detail_download(cache_dir, releases):
 
         details_release['binary_interest'] = binary_interest
 
-        url = urljoin(SNAPSHOT_BASEURL, '/'.join([release, 'rpm.unique.list']))
+        url = snapshot_url(release, 'rpm.unique.list')
         binaries = request_cached(url, cache_dir, ttl_never).strip().splitlines()
 
         binary_interest_changed = []
