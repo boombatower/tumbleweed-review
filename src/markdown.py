@@ -3,6 +3,7 @@ from main import ROOT_PATH
 from os import path
 from snapshot import snapshot_url
 from util.common import ensure_directory
+from util.common import release_parts
 import yaml
 
 def data_load(data_dir):
@@ -99,7 +100,7 @@ def posts_build(posts_dir, mail, snapshot):
             mail=mail_markdown,
         )
 
-        date = '-'.join([release[0:4], release[4:6], release[6:8]])
+        date = '-'.join(release_parts(release))
         post_name = '{}-release.md'.format(date)
         post_path = path.join(posts_dir, post_name)
         with open(post_path, 'w') as post_handle:

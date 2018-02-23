@@ -81,3 +81,6 @@ def request_cached(url, cache_dir, ttl=timedelta(hours=1)):
         cache_handle.write(response.text)
 
     return response.text
+
+def release_parts(release):
+    return release[0:4], release[4:6], release[6:8]
