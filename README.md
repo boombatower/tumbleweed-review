@@ -35,3 +35,7 @@ A subcommand is provided for each data source, scoring, and output to markdown. 
 - `markdown`
 
 Use the `--read-only` flag to clone the production site and dump local changed into it without committing. Otherwise use the `--output-dir` flag to dump elsewhere without a clone.
+
+## production
+
+The regularly updated site can be viewed at [review.tumbleweed.boombatower.com](http://review.tumbleweed.boombatower.com/).
