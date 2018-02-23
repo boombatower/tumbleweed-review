@@ -190,10 +190,11 @@ def subject_reduce(message, release):
 
     return subject
 
-def discussions_export(releases, discussions):
+def discussions_export(lookup, releases, discussions):
     export = {}
-    for release in sorted(releases):
+    for release, message_id in sorted(releases.items()):
         export[release] = {
+            'announcement': lookup[message_id].name,
             'reference_count': 0,
             'thread_count': 0,
             'threads': [],
@@ -240,7 +241,7 @@ def main(args):
     root, lookup, releases = mboxes_process(mbox_paths)
     discussions = discussions_find(root, lookup, releases)
     discussions = discussions_reduce(discussions)
-    export = discussions_export(releases, discussions)
+    export = discussions_export(lookup, releases, discussions)
 
     output_dir = path.join(args.output_dir, 'data')
     ensure_directory(output_dir)
