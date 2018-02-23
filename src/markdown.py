@@ -73,7 +73,7 @@ def posts_build(posts_dir, bug, mail, score, snapshot):
         reference_count_bug, bug_markdown = bug_build(bug.get(release, []))
         reference_count_mail, mail_markdown = mail_build(mail_release)
         reference_count = reference_count_bug + reference_count_mail
-        score_release = score.get(release, 'n/a')
+        score_release = score.get(release, {}).get('score', 'n/a')
 
         variables = {
             'release_available': str(release in snapshot).lower(),
@@ -124,19 +124,21 @@ def posts_build(posts_dir, bug, mail, score, snapshot):
         with open(post_path, 'w') as post_handle:
             post_handle.write(post)
 
-def main(args):
+def main(logger_, posts_dir, data_dir):
     global logger
-    logger = args.logger
+    logger = logger_
 
-    posts_dir = path.join(args.output_dir, '_posts')
     ensure_directory(posts_dir)
-    data_dir = path.join(args.output_dir, 'data')
-
     bug, mail, score, snapshot = data_load(data_dir)
     posts_build(posts_dir, bug, mail, score, snapshot)
+
+def argparse_main(args):
+    posts_dir = path.join(args.output_dir, '_posts')
+    data_dir = path.join(args.output_dir, 'data')
+    main(args.logger, posts_dir, data_dir)
 
 def argparse_configure(subparsers):
     parser = subparsers.add_parser(
         'markdown',
         help='Generate markdown files for Jekyll site.')
-    parser.set_defaults(func=main)
+    parser.set_defaults(func=argparse_main)

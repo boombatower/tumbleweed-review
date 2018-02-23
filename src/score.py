@@ -72,8 +72,11 @@ def score(bugs, mail, snapshot):
             impact += 0.40 * impact_previous
         impact_previous = impact
 
-        score = 100 - impact
-        scores[release] = int(score)
+        score = int(100 - impact)
+        scores[release] = {
+            'score': score,
+            'stability_level': stability_level(release, score),
+        }
 
     return scores
 
