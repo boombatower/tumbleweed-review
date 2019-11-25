@@ -12,6 +12,7 @@ theme: minima
 minima:
   date_format: "%Y-%m-%d"
 
+google_analytics: true
 show_excerpts: true
 excerpt_separator: <!--more-->
 
