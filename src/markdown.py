@@ -60,7 +60,7 @@ def table_format(headings, data, bold):
     return '\n'.join(out)
 
 def link_format(text, href):
-    return '[{}]({})'.format(text, href)
+    return '[{}]({})'.format(text.replace('[', '\[').replace(']', '\]'), href)
 
 def posts_build(posts_dir, bug, mail, score, snapshot):
     template_path = path.join(ROOT_PATH, 'jekyll', '_posts', '.template.md')
