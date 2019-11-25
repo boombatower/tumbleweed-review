@@ -236,20 +236,18 @@ def mailing_list_url(message):
     return MAILING_LIST_URL.format(
         list=MAILING_LIST, year=year, month=month, number=int(number))
 
-def main(args):
+def main(logger_, cache_dir, start_month, output_dir, refresh=True):
     global logger
-    logger = args.logger
+    logger = logger_
 
-    cache_dir = path.join(args.cache_dir, 'mbox')
     ensure_directory(cache_dir)
 
-    mbox_paths = mboxes_download(cache_dir, args.start_month, not args.no_refresh)
+    mbox_paths = mboxes_download(cache_dir, start_month, refresh)
     root, lookup, releases = mboxes_process(mbox_paths)
     discussions = discussions_find(root, lookup, releases)
     discussions = discussions_reduce(discussions)
     export = discussions_export(lookup, releases, discussions)
 
-    output_dir = path.join(args.output_dir, 'data')
     ensure_directory(output_dir)
     with open(path.join(output_dir, 'mail.yaml'), 'w') as outfile:
         yaml.safe_dump(export, outfile)
@@ -259,6 +257,11 @@ def main(args):
         print(RenderTree(root, style=AsciiStyle()).by_attr())
 
     discussion_print(export)
+
+def argparse_main(args):
+    cache_dir = path.join(args.cache_dir, 'mbox')
+    output_dir = path.join(args.output_dir, 'data')
+    main(args.logger, cache_dir, args.start_month, output_dir, not args.no_refresh)
 
 def date_month_arg(string):
     try:
@@ -270,7 +273,7 @@ def argparse_configure(subparsers):
     parser = subparsers.add_parser(
         'mail',
         help='Ingest {} mailing list data and dump as JSON and YAML.'.format(MAILING_LIST))
-    parser.set_defaults(func=main)
+    parser.set_defaults(func=argparse_main)
     parser.add_argument('--no-refresh',
                         action='store_true',
                         help='do not refresh relevant mboxes')
