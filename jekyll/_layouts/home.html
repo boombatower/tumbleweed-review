@@ -16,10 +16,12 @@ layout: default
       {% for post in site.posts %}
       <li>
         {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
+        <a class="post-link" href="{{ post.url | relative_url }}">
         <div class="release-meta release-stability-level-{{ post.release_stability_level }} release-available-{{ post.release_available }}">
           <span class="release-score">{{ post.release_score }}</span>
           <span class="release-stability-level">{{ post.release_stability_level }}</span>
         </div>
+        </a>
         <h3>
           <a class="post-link" href="{{ post.url | relative_url }}">
             {{ post.date | date: date_format }}
