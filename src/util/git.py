@@ -1,8 +1,6 @@
 import os
 from os import path
 import subprocess
-from util.common import CACHE_ROOT_DIR
-from xdg.BaseDirectory import save_cache_path
 
 def clone(url, directory):
     return_code = subprocess.call(['git', 'clone', url, directory])
