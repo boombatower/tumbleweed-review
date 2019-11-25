@@ -16,11 +16,11 @@ The above data sources are reviewed and each snapshot is given a stability score
 
 Releases with a low score will continue to impact future release scores with a gradual trail-off. Given that issues generally are not fixed immediately in the next release this assumes the next few releases may still be affected. If the issue persists and is severe it will likely be mentioned again in the mailing list and the score again reduced.
 
-Major system components that are either release candidates or low minor releases are also considered to be risky. For example, recent `Mesa` releases candidates caused white/black screens for many users which is not-trivial to recover from for less-technical users. Such issues come around from time to time since openQA does not test on real world hardware where such graphic driver issues are generally encountered.
+Major system components that are either release candidates or low minor releases are also considered to be risky. For example, recent `Mesa` release candidates caused white/black screens for many users which is not-trivial to recover from for less-technical users. Such issues come around from time to time since openQA does not test on real world hardware where such graphic driver issues are generally encountered.
 
-Release stability is considered to be `pending` for the first week after release to allow time for reports to surface. This of course depends on enthusiasts who update often, encounter and report problems.
+Release stability is considered to be `pending` for the first week after release to allow time for reports to surface. This of course depends on enthusiasts who update often, encounter, and report problems.
 
-The scoring is likely to be tweaked over time to reflect observations. It may also make sense to add a manual override feature to aid scoring when something critial is encountered.
+The scoring is likely to be tweaked over time to reflect observations. It may also make sense to add a manual override feature to aid scoring when something critical is encountered.
 
 ## future
 
