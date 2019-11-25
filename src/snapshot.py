@@ -10,7 +10,7 @@ from util.common import request_cached
 from util.common import request_cached_path
 import yaml
 
-SNAPSHOT_BASEURL = 'http://download.tumbleweed.boombatower.com/'
+SNAPSHOT_BASEURL = 'http://download.opensuse.org/history/'
 BINARY_REGEX = r'(?:.*::)?(?P<filename>(?P<name>.*?)-(?P<version>[^-]+)-(?P<release>[^-]+)\.(?P<arch>[^-\.]+))\.rpm'
 BINARY_INTEREST = [
     # Base.
@@ -42,6 +42,13 @@ def list_download(cache_dir):
 def snapshot_url(release, path):
     return urljoin(SNAPSHOT_BASEURL, '/'.join([release, path]))
 
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
+
 def list_detail_download(cache_dir, releases):
     details = {}
 
@@ -60,7 +67,7 @@ def list_detail_download(cache_dir, releases):
             disk_ttl = ttl_never
         disk = request_cached(url, cache_dir, disk_ttl).strip().splitlines()
 
-        if len(disk) != 3:
+        if len(disk) != 2:
             # Skip for now and retry later.
             logger.debug('skipping %s due to invalid disk file', release)
 
@@ -70,9 +77,9 @@ def list_detail_download(cache_dir, releases):
 
             continue
 
-        details_release['disk_base'] = disk[0].split('\t')[0]
+        details_release['disk_base'] = sizeof_fmt(int(disk[0].split('\t')[0]))
         details_release['binary_unique_count'] = int(disk[1].split(' ')[0])
-        details_release['disk_shared'] = disk[2].split('\t')[0]
+        details_release['disk_shared'] = 'unknown'
 
         url = snapshot_url(release, 'rpm.list')
         binaries = request_cached(url, cache_dir, ttl_never).strip().splitlines()
