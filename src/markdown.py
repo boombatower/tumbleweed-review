@@ -100,7 +100,7 @@ def posts_build(posts_dir, bug, mail, score, snapshot):
             binary_interest = ''
 
         if not bug_markdown:
-            bug_markdown = 'no relevant bugs'
+            bug_markdown = 'no relevant bugs due to [loss of bugzilla API access](https://bugzilla.opensuse.org/show_bug.cgi?id=1157722)'
         if not mail_markdown:
             mail_markdown = 'no relevant mails'
 
