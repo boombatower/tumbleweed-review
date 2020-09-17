@@ -7,7 +7,7 @@ RUN zypper -n in \
   python3-pip \
   python3-pyaml \
   python3-requests \
-  python3-xdg
+  python3-pyxdg
 
 # package not available
 RUN pip3 install anytree
