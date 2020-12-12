@@ -7,7 +7,7 @@ Tools for ingesting various data sources and scoring Tumbleweed release stabilit
 The following data sources our considered.
 
 - [bugzilla](https://bugzilla.opensuse.org/)
-- [opensuse-factory mailing list](https://lists.opensuse.org/opensuse-factory/)
+- [opensuse-factory mailing list](https://lists.opensuse.org/archives/list/factory@lists.opensuse.org/)
 - [Tumbleweed snapshot metadata](http://download.tumbleweed.boombatower.com/)
 
 ## scoring

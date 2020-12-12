@@ -17,10 +17,19 @@ from util.common import ensure_directory
 from xdg.BaseDirectory import save_cache_path
 import yaml
 
+# openSUSE switched over to new mailing list system (see issue #9).
+MIGRATION_YEAR = 2020
+MIGRATION_MONTH = 11
+
 MAILING_LIST = 'opensuse-factory'
-MAILING_LIST_URL = 'https://lists.opensuse.org/{list}/{year}-{month}/msg{number:05d}.html'
-MAILBOX_URL = 'https://lists.opensuse.org/{list}/{list}-{year}-{month}.mbox.gz'
-RELEASE_PATTERN = r'^\[{list}\] New Tumbleweed snapshot (?P<version>\d+) released!$'
+MAILING_LIST_SHORT = 'factory'
+MAILING_LIST_URL_PRE = 'https://lists.opensuse.org/{list}/{year}-{month}/msg{number:05d}.html'
+MAILING_LIST_URL_POST = 'https://github.com/boombatower/tumbleweed-review/issues/10'
+MAILBOX_URL_PRE = 'https://lists.opensuse.org/{list}/{list}-{year}-{month}.mbox.gz'
+MAILBOX_URL_POST = 'https://lists.opensuse.org/archives/list/{list}@lists.opensuse.org/export/{list}@lists.opensuse.org-{year}-{month}.mbox.gz?start=2020-{month}-01&end={end_date}'
+MAILBOX_PATH='{list}-{year}-{month}.mbox'
+RELEASE_PATTERN_PRE = r'^\[{list}\] New Tumbleweed snapshot (?P<version>\d+) released!$'
+RELEASE_PATTERN_POST = r'^New Tumbleweed snapshot (?P<version>\d+) released!$'
 RELEASE_PATTERN_SHORT = r'^New Tumbleweed snapshot (?P<version>\d+)( released!)?$'
 
 def month_generator(month_start):
@@ -35,6 +44,17 @@ def month_generator(month_start):
 
         month = month.replace(day=1) - timedelta(days=17)
 
+def month_next_start(date):
+    return (date.replace(day=17) + timedelta(days=17)).replace(day=1)
+
+def mboxes_download_url(month_date, year, month):
+    # Does not handle partial month split and parsing both mail boxes.
+    if month_date.year >= MIGRATION_YEAR and month_date.month >= MIGRATION_MONTH:
+        end_date = month_next_start(month_date)
+        return MAILBOX_URL_POST.format(list=MAILING_LIST_SHORT, year=year, month=month, end_date=end_date)
+
+    return MAILBOX_URL_PRE.format(list=MAILING_LIST, year=year, month=month)
+
 def mboxes_download(cache_dir, month_start, refresh=True):
     """Download mboxes for given month range."""
     mbox_paths = {}
@@ -44,8 +64,8 @@ def mboxes_download(cache_dir, month_start, refresh=True):
         month = month_date.strftime('%m')
         logger.info('ingest {}-{}'.format(year, month))
 
-        mbox_url = MAILBOX_URL.format(list=MAILING_LIST, year=year, month=month)
-        mbox_name = path.basename(mbox_url)[:-3] # Remove .gz extension.
+        mbox_url = mboxes_download_url(month_date, year, month)
+        mbox_name = MAILBOX_PATH.format(list=MAILING_LIST, year=year, month=month)
         mbox_path = path.join(cache_dir, mbox_name)
         mbox_paths[mbox_path] = (year, month)
 
@@ -78,8 +98,13 @@ def mboxes_process(mbox_paths):
     releases = {}
 
     # Process in reverse order to allow newer messages to reference older ones.
-    release_pattern = re.compile(RELEASE_PATTERN.format(list=MAILING_LIST))
+    release_pattern = re.compile(RELEASE_PATTERN_PRE.format(list=MAILING_LIST))
     for mbox_path, month in sorted(mbox_paths.items()):
+        if int(month[0]) >= MIGRATION_YEAR and int(month[1]) >= MIGRATION_MONTH + 1:
+            # To test ones sanity the mailing list prefix was dropped after the
+            # migration so this will miss 20201129 released on Nov 30.
+            release_pattern = re.compile(RELEASE_PATTERN_POST)
+
         index = '-'.join(month)
         mbox = mailbox.mbox(mbox_path)
 
@@ -87,22 +112,30 @@ def mboxes_process(mbox_paths):
             message = mbox[key]
             logger.debug('<%s> %s', key, message['subject'])
 
+            # Newer mailing list seems to include 'dead' mail.
+            if message['message-id'] is None or message['subject'] is None:
+                continue
+
             # Build tree of message to aid in relating messages to release.
             parent = None
             if message['in-reply-to']:
-                if message['in-reply-to'] in lookup:
-                    parent = lookup[message['in-reply-to']]
+                in_reply_to = message_id_normalize(message['in-reply-to'])
+                if in_reply_to in lookup:
+                    parent = lookup[in_reply_to]
                 else:
-                    logger.debug('message {} not found'.format(message['in-reply-to']))
+                    logger.debug('message {} not found'.format(in_reply_to))
 
             # Either no in-reply-to or message not found, attempt references.
             if not parent and message['references']:
                 # By checking references in reverse order the deepest message
                 # will be selected as parent.
                 for reference in reversed(re.split(r'[\n\s]+', message['references'])):
+                    reference = message_id_normalize(reference)
                     if reference in lookup:
                         parent = lookup[reference]
                         break
+                    else:
+                        logger.debug('message {} not found'.format(reference))
 
             if not parent:
                 parent = root
@@ -120,6 +153,15 @@ def mboxes_process(mbox_paths):
                 '{}.{}'.format(index, key), parent=parent, message=message, month=month, release=release)
 
     return root, lookup, releases
+
+# The newer mailing list strips <> from the in-reply-to header while leaving <>
+# in the message-id. As such normalize other headers so they will match the
+# message-id. Also pray upstream has a reasonable explanation for this.
+def message_id_normalize(message_id):
+    if message_id.startswith('<'):
+        return message_id
+
+    return '<{}>'.format(message_id)
 
 def discussions_find(root, lookup, releases):
     """Find discussions relevant to releases within tree."""
@@ -233,7 +275,13 @@ def discussion_print(export):
 def mailing_list_url(message):
     month, number = message.split('.')
     year, month = month.split('-')
-    return MAILING_LIST_URL.format(
+
+    if int(year) >= MIGRATION_YEAR and int(month) >= MIGRATION_MONTH:
+        # New mailing list does not produce predictable URLs nor include the
+        # Archived-At header in the mbox downloads.
+        return MAILING_LIST_URL_POST
+
+    return MAILING_LIST_URL_PRE.format(
         list=MAILING_LIST, year=year, month=month, number=int(number))
 
 def main(logger_, cache_dir, start_month, output_dir, refresh=True):
