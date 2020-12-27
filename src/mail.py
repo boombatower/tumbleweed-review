@@ -12,9 +12,7 @@ from os import path
 import re
 import requests
 import shutil
-import sys
 from util.common import ensure_directory
-from xdg.BaseDirectory import save_cache_path
 import yaml
 
 # openSUSE switched over to new mailing list system (see issue #9).

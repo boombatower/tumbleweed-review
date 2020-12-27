@@ -2,7 +2,6 @@
 
 import argparse
 import logging
-import os
 from os import path
 import sys
 from util.common import CACHE_ROOT_DIR

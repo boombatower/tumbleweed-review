@@ -2,7 +2,6 @@ from datetime import timedelta
 import os
 from os import path
 import re
-import requests
 import stat
 from urllib.parse import urljoin
 from util.common import ensure_directory

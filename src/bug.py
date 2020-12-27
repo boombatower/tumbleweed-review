@@ -1,7 +1,4 @@
-import argparse
 import bugzilla
-from datetime import date
-from datetime import datetime
 from mail import date_month_arg
 from os import path
 from urllib.parse import urljoin
