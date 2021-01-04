@@ -49,7 +49,7 @@ def month_next_start(date):
 
 def mboxes_download_url(month_date, year, month):
     # Does not handle partial month split and parsing both mail boxes.
-    if month_date.year >= MIGRATION_YEAR and month_date.month >= MIGRATION_MONTH:
+    if month_date.year > MIGRATION_YEAR or (month_date.year == MIGRATION_YEAR and month_date.month >= MIGRATION_MONTH):
         end_date = month_next_start(month_date)
         return MAILBOX_URL_POST.format(list=MAILING_LIST_SHORT, year=year, month=month, end_date=end_date)
 
@@ -100,7 +100,7 @@ def mboxes_process(mbox_paths):
     # Process in reverse order to allow newer messages to reference older ones.
     release_pattern = re.compile(RELEASE_PATTERN_PRE.format(list=MAILING_LIST))
     for mbox_path, month in sorted(mbox_paths.items()):
-        if int(month[0]) >= MIGRATION_YEAR and int(month[1]) >= MIGRATION_MONTH + 1:
+        if int(month[0]) > MIGRATION_YEAR or (int(month[0]) == MIGRATION_YEAR and int(month[1]) >= MIGRATION_MONTH + 1):
             # To test ones sanity the mailing list prefix was dropped after the
             # migration so this will miss 20201129 released on Nov 30.
             release_pattern = re.compile(RELEASE_PATTERN_POST)
@@ -276,7 +276,7 @@ def mailing_list_url(message):
     month, number = message.split('.')
     year, month = month.split('-')
 
-    if int(year) >= MIGRATION_YEAR and int(month) >= MIGRATION_MONTH:
+    if int(year) > MIGRATION_YEAR or (int(year) == MIGRATION_YEAR and int(month) >= MIGRATION_MONTH):
         # New mailing list does not produce predictable URLs nor include the
         # Archived-At header in the mbox downloads.
         return MAILING_LIST_URL_POST
