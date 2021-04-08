@@ -1,4 +1,4 @@
-FROM opensuse/tumbleweed
+FROM opensuse/leap
 MAINTAINER Jimmy Berry <jimmy@boombatower.com>
 
 RUN zypper -n in \
