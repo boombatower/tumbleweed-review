@@ -16,8 +16,9 @@ BINARY_INTEREST = [
     # Base.
     'kernel-source',
     'gcc',
-    'gcc7',
     'gcc9', # TODO perhaps 'gcc' + gcc.version
+    'gcc10',
+    'gcc11',
     # Graphics.
     'Mesa',
     'llvm',
