@@ -16,9 +16,7 @@ BINARY_INTEREST = [
     # Base.
     'kernel-source',
     'gcc',
-    'gcc9', # TODO perhaps 'gcc' + gcc.version
-    'gcc10',
-    'gcc11',
+    # Automatically includes gcc\d+ for -1, 0, +1 of current version.
     # Graphics.
     'Mesa',
     'llvm',
@@ -36,6 +34,7 @@ BINARY_INTEREST = [
     'gnome-builder',
     'gtk3-devel',
 ]
+BINARY_INTEREST_GCC = r'^gcc(?P<major_version>\d+)$'
 
 def list_download(cache_dir):
     url = urljoin(SNAPSHOT_BASEURL, 'list')
@@ -55,6 +54,7 @@ def list_detail_download(cache_dir, releases):
     details = {}
 
     binary_regex = re.compile(BINARY_REGEX)
+    binary_gcc_regex = re.compile(BINARY_INTEREST_GCC)
     ttl_never = timedelta(days=300) # Should never change.
     ttl_retry = timedelta(hours=4) # While waiting for snapshot.
     for release in releases:
@@ -94,13 +94,29 @@ def list_detail_download(cache_dir, releases):
                 continue
 
             binary_name = binary_match.group('name')
-            if binary_name not in BINARY_INTEREST:
+            # Include all packages of interest and any gcc\d+ package to be filtered later.
+            if not (binary_name in BINARY_INTEREST or binary_gcc_regex.match(binary_name)):
                 continue
 
             # When multiple verisons of the same binary are present ensure the latest version wins.
             if (binary_name not in binary_interest or
                 version_parse(binary_interest[binary_name]) < version_parse(binary_match.group('version'))):
                 binary_interest[binary_name] = binary_match.group('version')
+
+        # Assuming the default gcc version is found filter major gcc packages to near the version.
+        if 'gcc' in binary_interest:
+            gcc_major_version = int(binary_interest['gcc'])
+            gcc_major_versions = [gcc_major_version - 1, gcc_major_version, gcc_major_version + 1]
+            binary_interest_filtered = {}
+            for binary_name, binary_version in binary_interest.items():
+                match = binary_gcc_regex.match(binary_name)
+                if match:
+                    if int(match.group('major_version')) not in gcc_major_versions:
+                        continue
+
+                binary_interest_filtered[binary_name] = binary_version
+
+            binary_interest = binary_interest_filtered
 
         details_release['binary_interest'] = binary_interest
 
@@ -110,7 +126,7 @@ def list_detail_download(cache_dir, releases):
         binary_interest_changed = []
         for binary in binaries:
             binary_match = binary_regex.match(path.basename(binary))
-            if binary_match and binary_match.group('name') in BINARY_INTEREST:
+            if binary_match and binary_match.group('name') in binary_interest:
                 binary_interest_changed.append(binary_match.group('name'))
 
         details_release['binary_interest_changed'] = binary_interest_changed
