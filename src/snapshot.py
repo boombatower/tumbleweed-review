@@ -1,6 +1,7 @@
 from datetime import timedelta
 import os
 from os import path
+from packaging.version import parse as version_parse
 import re
 import stat
 from urllib.parse import urljoin
@@ -89,8 +90,17 @@ def list_detail_download(cache_dir, releases):
         binary_interest = {}
         for binary in binaries:
             binary_match = binary_regex.match(path.basename(binary))
-            if binary_match and binary_match.group('name') in BINARY_INTEREST:
-                binary_interest[binary_match.group('name')] = binary_match.group('version')
+            if not binary_match:
+                continue
+
+            binary_name = binary_match.group('name')
+            if binary_name not in BINARY_INTEREST:
+                continue
+
+            # When multiple verisons of the same binary are present ensure the latest version wins.
+            if (binary_name not in binary_interest or
+                version_parse(binary_interest[binary_name]) < version_parse(binary_match.group('version'))):
+                binary_interest[binary_name] = binary_match.group('version')
 
         details_release['binary_interest'] = binary_interest
 

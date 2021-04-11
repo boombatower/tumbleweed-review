@@ -10,6 +10,6 @@ RUN zypper -n in \
   python3-pyxdg
 
 # package not available
-RUN pip3 install anytree
+RUN pip3 install anytree packaging
 
 ADD . /srv
