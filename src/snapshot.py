@@ -123,13 +123,13 @@ def list_detail_download(cache_dir, releases):
         url = snapshot_url(release, 'rpm.unique.list')
         binaries = request_cached(url, cache_dir, ttl_never).strip().splitlines()
 
-        binary_interest_changed = []
+        binary_interest_changed = set()
         for binary in binaries:
             binary_match = binary_regex.match(path.basename(binary))
             if binary_match and binary_match.group('name') in binary_interest:
-                binary_interest_changed.append(binary_match.group('name'))
+                binary_interest_changed.add(binary_match.group('name'))
 
-        details_release['binary_interest_changed'] = binary_interest_changed
+        details_release['binary_interest_changed'] = list(binary_interest_changed)
 
         details[release] = details_release
 
