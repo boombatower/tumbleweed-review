@@ -34,7 +34,8 @@ def mail_build(mail_release):
         line += ' ({} refs)'.format(thread['reference_count'])
         extra = []
         for message in thread['messages'][1:]:
-            extra.append(link_format(message, mailing_list_url(message)))
+            name, _ = message.split('::', 1)
+            extra.append(link_format(name, mailing_list_url(message)))
 
         if len(extra):
             line += '; ' + ', '.join(extra)

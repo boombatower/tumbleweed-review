@@ -1,9 +1,12 @@
 from anytree import Node
 import argparse
+from base64 import b32encode
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+import email.utils
 import gzip
+from hashlib import sha1
 import io
 import logging
 import mailbox
@@ -22,7 +25,7 @@ MIGRATION_MONTH = 11
 MAILING_LIST = 'opensuse-factory'
 MAILING_LIST_SHORT = 'factory'
 MAILING_LIST_URL_PRE = 'https://lists.opensuse.org/{list}/{year}-{month}/msg{number:05d}.html'
-MAILING_LIST_URL_POST = 'https://github.com/boombatower/tumbleweed-review/issues/10'
+MAILING_LIST_URL_POST = 'https://lists.opensuse.org/archives/list/factory@lists.opensuse.org/thread/{hash}'
 MAILBOX_URL_PRE = 'https://lists.opensuse.org/{list}/{list}-{year}-{month}.mbox.gz'
 MAILBOX_URL_POST = 'https://lists.opensuse.org/archives/list/{list}@lists.opensuse.org/export/{list}@lists.opensuse.org-{year}-{month}.mbox.gz?start=2020-{month}-01&end={end_date}'
 MAILBOX_PATH='{list}-{year}-{month}.mbox'
@@ -234,7 +237,7 @@ def discussions_export(lookup, releases, discussions):
     export = {}
     for release, message_id in sorted(releases.items()):
         export[release] = {
-            'announcement': lookup[message_id].name,
+            'announcement': '::'.join([lookup[message_id].name, message_id]),
             'reference_count': 0,
             'thread_count': 0,
             'threads': [],
@@ -251,7 +254,7 @@ def discussions_export(lookup, releases, discussions):
             }
 
             for message in messages:
-                thread['messages'].append(message.name)
+                thread['messages'].append('::'.join([message.name, message.message['message-id']]))
 
                 thread_size = len(message.descendants) + 1 # Include self.
                 thread['reference_count'] += thread_size
@@ -271,16 +274,20 @@ def discussion_print(export):
                 thread['summary'], thread['reference_count'], ', '.join(thread['messages'])))
 
 def mailing_list_url(message):
-    month, number = message.split('.')
+    name, message_id = message.split('::', 1)
+    month, number = name.split('.')
     year, month = month.split('-')
 
     if int(year) > MIGRATION_YEAR or (int(year) == MIGRATION_YEAR and int(month) >= MIGRATION_MONTH):
-        # New mailing list does not produce predictable URLs nor include the
-        # Archived-At header in the mbox downloads.
-        return MAILING_LIST_URL_POST
+        return MAILING_LIST_URL_POST.format(hash=message_id_hash(message_id))
 
     return MAILING_LIST_URL_PRE.format(
         list=MAILING_LIST, year=year, month=month, number=int(number))
+
+# Mimiced from https://gitlab.com/mailman/hyperkitty/-/blob/201b5d350253c7866097602e305e580ad4d50d50/hyperkitty/lib/utils.py#L48-56.
+def message_id_hash(message_id):
+    message_id = email.utils.unquote(message_id).encode('utf-8')
+    return b32encode(sha1(message_id).digest()).decode('utf-8')
 
 def main(logger_, cache_dir, start_month, output_dir, refresh=True):
     global logger
