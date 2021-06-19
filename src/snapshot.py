@@ -129,7 +129,7 @@ def list_detail_download(cache_dir, releases):
             if binary_match and binary_match.group('name') in binary_interest:
                 binary_interest_changed.add(binary_match.group('name'))
 
-        details_release['binary_interest_changed'] = list(binary_interest_changed)
+        details_release['binary_interest_changed'] = list(sorted(binary_interest_changed))
 
         details[release] = details_release
 
