@@ -25,6 +25,7 @@ BINARY_INTEREST = [
     'xf86-video-amdgpu',
     'xf86-video-intel',
     'xf86-video-nouveau',
+    'xwayland',
     # Desktop: Plasma.
     'libqt5-qtbase-devel',
     'plasma-framework',
