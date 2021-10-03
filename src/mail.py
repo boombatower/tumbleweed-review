@@ -65,6 +65,11 @@ def mboxes_download(cache_dir, month_start, refresh=True):
         month = month_date.strftime('%m')
         logger.info('ingest {}-{}'.format(year, month))
 
+        # See #18 regarding upstream bug.
+        if year == '2021' and month == '07':
+            logger.info('skipping ingest of {}-{} due to data corruption problem'.format(year, month))
+            continue
+
         mbox_url = mboxes_download_url(month_date, year, month)
         mbox_name = MAILBOX_PATH.format(list=MAILING_LIST, year=year, month=month)
         mbox_path = path.join(cache_dir, mbox_name)
